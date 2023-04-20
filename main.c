@@ -1,8 +1,25 @@
+# ZERO   0b1000
+# BORROW 0b0100
+# CARRY  0b0010
+# PARITY 0b0001
+
+int limitRegs() {
+	// Regs
+	a  &= 0xF;
+	b  &= 0xF;
+	pc &= 0xFFF;
+	sp &= 0xFFF;
+	// Flags
+	flags &= 0xF;
+}
+
+// TODO: Replace individual Flags with flags reg;
 int main() {
 	int pc = 0x000;
+	int sp = 0xFFF;
 	char a, b;
 	char opcode;
-	char carry;
+	char flags;
 	switch(opcode & 0xF) {
 		case 0: // NAND
 			a = ~(a & b);
@@ -19,9 +36,9 @@ int main() {
 		case 3: // ADD
 			a += b;
 			if (a & 0b10000) {
-				carry = 1;
+				flags |= CARRY;
 			} else {
-				carry = 0;
+				flags &= !CARRY;
 			}
 			pc += 1;
 			break;
@@ -50,10 +67,10 @@ int main() {
 					pc += 3;
 					break;
 				case 0b0010: // PC; opcode reg (loc3 loc2 loc1)
-					pc = memory[pc+2] memory[pc+3] memory[pc+4]
+					pc = (memory[pc+2]<<8) | (memory[pc+3]<<4) | (memory[pc+4]);
 					break;
 				case 0b0001: // SP
-					sp = 
+					sp = (memory[pc+2]<<8) | (memory[pc+3]<<4) | (memory[pc+4]);
 					pc += 5;
 					break;
 				default:
@@ -61,6 +78,7 @@ int main() {
 					break;
 			}
 			break;
+		case 7: 
 		default:
 			printf("Illegal Opcode");
 			break;
