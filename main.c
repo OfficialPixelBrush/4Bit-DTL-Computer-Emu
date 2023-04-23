@@ -34,6 +34,7 @@ int checkParity(char input) {
 	return parity & 1;
 }
 
+// Limit all Registers to their appropriate limits
 int limitRegs() {
 	// Regs
 	a  &= 0xF;
@@ -236,10 +237,12 @@ int main() {
 					case 0b1000: // A
 						a = memory[sp];
 						sp -= 1;
+						pc += 2;
 						break;
 					case 0b0100: // B
 						b = memory[sp];
 						sp -= 1;
+						pc += 2;
 						break;
 					case 0b0010: // PC
 						pc = (memory[sp]<<8) | (memory[sp+1]<<4) | (memory[sp+2]);
@@ -247,15 +250,13 @@ int main() {
 						break;
 					case 0b0001: // SP
 						sp = (memory[sp]<<8) | (memory[sp+1]<<4) | (memory[sp+2]);
-						// TODO: Figure this behaviour out
-						//sp -= 3;
+						pc += 2;
 						break;
 					default:
 						printf("Illegal Register");
 						break;
 				}
 				// TODO: Don't increase if PC was changed
-				pc += 2;
 				break;
 			case 0xC: // JSR f,a
 				if (memory[pc+1] & flags) {
@@ -293,6 +294,7 @@ int main() {
 				pc += 2;
 				break;
 			default:
+				// This should never occur unless somehow someone adds another number of hexadecimal
 				printf("Illegal Opcode");
 				break;
 		}
