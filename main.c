@@ -198,9 +198,11 @@ int main() {
 				pc += 5; // Same size for all
 				break;
 			case 9: // SWP
-				temp = a;
-				a = b;
-				b = temp;
+				// Shoutout to Programming Memes
+				// https://twitter.com/PR0GRAMMERHUM0R/status/1650454565890686976?s=20
+				a ^= b
+				b ^= a
+				a ^= b
 				pc += 1;
 				break;
 			case 0xA: // PSH r
