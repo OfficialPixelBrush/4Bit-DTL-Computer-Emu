@@ -13,6 +13,11 @@
   ((byte) & 0x02 ? '1' : '0'), \
   ((byte) & 0x01 ? '1' : '0') 
 
+#define BYTE_TO_FLAGS(byte)  \
+  ((byte) & 0x08 ? 'Z' : '-'), \
+  ((byte) & 0x04 ? 'B' : '-'), \
+  ((byte) & 0x02 ? 'C' : '-'), \
+  ((byte) & 0x01 ? 'P' : '-') 
 int  pc = 0x000;
 int  sp = 0xFFF;
 char a, b = 0x0;
@@ -62,7 +67,7 @@ int limitRegs() {
 }
 
 int printStatus() {
-	printf("mem[%X]:%X | A:%X B:%X | SP:%X | "BYTE_TO_BINARY_PATTERN"\n", pc, memory[pc], a, b, sp, BYTE_TO_BINARY(flags));
+	printf("mem[%X]:%X | A:%X B:%X | SP:%X | "BYTE_TO_BINARY_PATTERN"\n", pc, memory[pc], a, b, sp, BYTE_TO_FLAGS(flags));
 	return 0;
 }
 
@@ -71,7 +76,7 @@ int main() {
 	limitRegs();
 	
 	// Load file
-	FILE *in_file  = fopen("F:/GitHub/4Bit-DTL-Computer/Example/count.bin", "rb"); // read only
+	FILE *in_file  = fopen("C:/Users/letsp/Desktop/GitHub/4Bit-DTL-Computer/Example/count.bin", "rb"); // read only
 	char c;
 	int i = 0;
     c = fgetc(in_file);
@@ -86,7 +91,6 @@ int main() {
 	
 	// Run the emulator
 	while(1) {
-		printStatus();
 		Sleep(1);
 		opcode = memory[pc];
 		switch(opcode & 0xF) {
@@ -103,7 +107,7 @@ int main() {
 				pc += 1;
 				break;
 			case 3: // ADD
-				a = a + b + (flags & CARRY >> 1);
+				a = a + b + ((flags & CARRY) >> 1);
 				if (a & 0b10000) {
 					flags |= CARRY;
 				} else {
@@ -200,9 +204,9 @@ int main() {
 			case 9: // SWP
 				// Shoutout to Programming Memes
 				// https://twitter.com/PR0GRAMMERHUM0R/status/1650454565890686976?s=20
-				a ^= b
-				b ^= a
-				a ^= b
+				a ^= b;
+				b ^= a;
+				a ^= b;
 				pc += 1;
 				break;
 			case 0xA: // PSH r
@@ -303,5 +307,6 @@ int main() {
 		
 		// Limit all registers to their intended ranges
 		limitRegs();
+		printStatus();
 	}
 }
